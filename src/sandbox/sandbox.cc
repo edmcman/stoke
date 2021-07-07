@@ -362,6 +362,11 @@ Function Sandbox::emit_harness() {
   assm_.push_1(r14);
   assm_.push_1(r15);
 
+  // Start timing here
+  assm_.mov((R64)rax, Imm64(&std::chrono::steady_clock::now));
+  assm_.call(rax);
+  assm_.mov(Moffs64(&time_before), rax);
+
   // Save the %rsp for this stack frame
   // If control ever traps an exception, we'll restore the %rsp here
   // and jump back out of this function
@@ -389,6 +394,11 @@ Function Sandbox::emit_harness() {
   assm_.xchg(rax, M64(rsp));
   assm_.call(M64(rsp));
   assm_.lea(rsp, M64(rsp, Imm32(8)));
+
+  // Stop timing here
+  assm_.mov((R64)rax, Imm64(&std::chrono::steady_clock::now));
+  assm_.call(rax);
+  assm_.mov(Moffs64(&time_after), rax);
 
   // Restore callee-save state
   assm_.pop_1(r15);

@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
   Console::msg() << "Sandbox::run()..." << endl;
 
-  const auto start = steady_clock::now();
+  auto total_elapsed = std::chrono::steady_clock::duration::zero ();
 
   for (size_t i = 0; i < benchmark_itr_arg; ++i) {
     // These could be moved out of the loop; but in the real search
@@ -69,8 +69,10 @@ int main(int argc, char** argv) {
 
     // Run the sandbox
     sb.run();
+
+    total_elapsed += (sb.time_after - sb.time_before);
   }
-  const auto dur = duration_cast<duration<double>>(steady_clock::now() - start);
+  const auto dur = duration_cast<duration<double>>(total_elapsed);
   const auto rps = tcs.size() * benchmark_itr_arg / dur.count();
 
   Console::msg() << fixed;

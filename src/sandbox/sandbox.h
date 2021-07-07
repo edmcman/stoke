@@ -258,6 +258,11 @@ private:
   /** I/O pairs. These are pointers to simplify vector reallocations. */
   std::vector<IoPair*> io_pairs_;
 
+  /** Benchmarking clocks */
+public:
+  std::chrono::time_point<std::chrono::steady_clock> time_before, time_after;
+
+private:
   /** Global callback to invoke before any line is executed. */
   std::pair<StateCallback, void*> global_before_;
   /** Before callbacks on a per-line basis */

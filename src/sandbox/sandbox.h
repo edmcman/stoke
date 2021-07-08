@@ -266,6 +266,8 @@ public:
 
   std::chrono::steady_clock::duration total_time;
 
+  bool normal_exit;
+
 private:
   /** Global callback to invoke before any line is executed. */
   std::pair<StateCallback, void*> global_before_;

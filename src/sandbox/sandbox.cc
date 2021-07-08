@@ -433,6 +433,8 @@ Function Sandbox::emit_harness() {
   assm_.pop_1(rbx);
 
   // If control has made it back here, we've exited normally; return 0
+  assm_.mov((R64)rax, Imm64(1));
+  assm_.mov(Moffs64(&normal_exit), rax);
   assm_.mov(rax, Imm32(0));
   assm_.ret();
 

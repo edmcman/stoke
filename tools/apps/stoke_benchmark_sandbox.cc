@@ -70,7 +70,15 @@ int main(int argc, char** argv) {
     // Run the sandbox
     sb.harness_iterations_remaining = benchmark_itr_arg;
     sb.total_time = std::chrono::steady_clock::duration::zero ();
-    sb.run();
+
+    for (size_t i = 0, ie = sb.size(); i < ie; ++i) {
+      sb.normal_exit = 0;
+      sb.run(i);
+      if (!sb.normal_exit) {
+        Console::error() << "Failed to execute testcase " << i << "!" << std::endl;
+        exit (1);
+      }
+    }
 
     total_elapsed_seconds = sb.total_time;
   }

@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
 
   Console::msg() << "Sandbox::run()..." << endl;
 
-  auto total_elapsed = std::chrono::steady_clock::duration::zero ();
+  auto total_elapsed_seconds = std::chrono::duration<double>::zero ();
 
   for (size_t i = 0; i < benchmark_itr_arg; ++i) {
     // These could be moved out of the loop; but in the real search
@@ -70,17 +70,21 @@ int main(int argc, char** argv) {
     // Run the sandbox
     sb.run();
 
-    total_elapsed += (sb.time_after - sb.time_before);
+    total_elapsed_seconds += (sb.time_after - sb.time_before);
+
+    // Debugging
+    if (true) {
+      Console::msg() << "duration of iteration " << i << ": " << std::chrono::duration<double>(sb.time_after - sb.time_before).count() << " sec, total duration: " << total_elapsed_seconds.count () << " sec" << endl;
+    }
   }
-  const auto dur = duration_cast<duration<double>>(total_elapsed);
-  const auto rps = tcs.size() * benchmark_itr_arg / dur.count();
+  const auto rps = tcs.size() * benchmark_itr_arg / total_elapsed_seconds.count();
 
   Console::msg() << fixed;
   Console::msg() << "LOC:        " << loc << endl;
   Console::msg() << "Derefs:     " << mds << endl;
   Console::msg() << "Testcases:  " << tcs.size() << endl;
   Console::msg() << "Iterations: " << benchmark_itr_arg.value() << endl;
-  Console::msg() << "Runtime:    " << dur.count() << " seconds" << endl;
+  Console::msg() << "Runtime:    " << total_elapsed_seconds.count () << endl;
   Console::msg() << "Throughput: " << rps << " / second" << endl;
 
   return 0;

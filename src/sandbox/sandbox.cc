@@ -416,7 +416,7 @@ Function Sandbox::emit_harness() {
   // This is crashing???
   //assm_.int3();
   //std::cout << "cool " << &time_before << std::endl;
-  //assm_.mov(Moffs64(&time_before), rax);
+  assm_.mov(Moffs64(&time_before), rax);
   assm_.jmp(Label {"_harness_loop"});
 
   //assm_.mov(Moffs64(&time_after), rax);

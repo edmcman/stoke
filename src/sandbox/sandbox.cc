@@ -441,8 +441,6 @@ Function Sandbox::emit_harness() {
   bool ok = assm_.finish();
   assert(ok);
 
-  std::cerr << fxn << std::endl;
-
   return fxn;
 }
 

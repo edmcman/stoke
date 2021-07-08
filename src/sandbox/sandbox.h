@@ -262,6 +262,10 @@ private:
 public:
   std::chrono::time_point<std::chrono::steady_clock> time_before, time_after;
 
+  int64_t harness_iterations_remaining;
+
+  std::chrono::steady_clock::duration total_time;
+
 private:
   /** Global callback to invoke before any line is executed. */
   std::pair<StateCallback, void*> global_before_;

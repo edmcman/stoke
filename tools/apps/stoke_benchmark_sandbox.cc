@@ -61,16 +61,19 @@ int main(int argc, char** argv) {
 
   auto total_elapsed_seconds = std::chrono::duration<double>::zero ();
 
-  for (size_t i = 0; i < benchmark_itr_arg; ++i) {
+  for (size_t i = 0; i < 1; ++i) {
     // These could be moved out of the loop; but in the real search
     // they are called frequently, so for benchmarking, keep them in.
     sb.insert_function(target);
     sb.set_entrypoint(target.get_code()[0].get_operand<x64asm::Label>(0));
 
     // Run the sandbox
+    sb.harness_iterations_remaining = benchmark_itr_arg;
+    sb.total_time = std::chrono::steady_clock::duration::zero ();
     sb.run();
 
-    total_elapsed_seconds += (sb.time_after - sb.time_before);
+    total_elapsed_seconds = sb.total_time;
+    //total_elapsed_seconds += (sb.time_after - sb.time_before);
 
     // Debugging
     if (true) {

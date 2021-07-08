@@ -362,16 +362,19 @@ Function Sandbox::emit_harness() {
   assm_.push_1(r14);
   assm_.push_1(r15);
 
-  // Start timing here
-  assm_.mov((R64)rax, Imm64(&std::chrono::steady_clock::now));
-  assm_.call(rax);
-  assm_.mov(Moffs64(&time_before), rax);
-
   // Save the %rsp for this stack frame
   // If control ever traps an exception, we'll restore the %rsp here
   // and jump back out of this function
   assm_.mov(rax, rsp);
   assm_.mov(Moffs64(&harness_rsp_), rax);
+
+  // Begin iteration loop here
+  assm_.bind(Label {"_harness_loop"});
+
+  // Start timing here
+  assm_.mov((R64)rax, Imm64(&std::chrono::steady_clock::now));
+  assm_.call(rax);
+  assm_.mov(Moffs64(&time_before), rax);
 
   // Call the function that loads the user's CPU state
   // This DOES NOT include the user's %rsp (if it did we would crash on return)
@@ -398,7 +401,38 @@ Function Sandbox::emit_harness() {
   // Stop timing here
   assm_.mov((R64)rax, Imm64(&std::chrono::steady_clock::now));
   assm_.call(rax);
-  assm_.mov(Moffs64(&time_after), rax);
+
+  // rbx = time_after
+  assm_.mov(rbx, rax);
+
+
+  // rcx = time_before
+  assm_.mov(rax, Moffs64(&time_before));
+  assm_.mov(rcx, rax);
+
+  assm_.mov(rax, Moffs64(&total_time));
+  //assm_.add(rax, rbx);
+  //assm_.sub(rax, rcx);
+  // This is crashing???
+  //assm_.int3();
+  //std::cout << "cool " << &time_before << std::endl;
+  //assm_.mov(Moffs64(&time_before), rax);
+  assm_.jmp(Label {"_harness_loop"});
+
+  //assm_.mov(Moffs64(&time_after), rax);
+  //assm_.mov(rbx, Moffs64(&time_before));
+
+  //assm_.sub(rax, rbx);
+
+  // Decrease harness_iterations_remaining
+  assm_.mov((R64)rax, Imm64(&harness_iterations_remaining));
+  assm_.mov(rbx, M64(rax));
+  // XXX: Use lea?
+  assm_.dec(rbx);
+  assm_.mov(M64(rax), rbx);
+  // Conditional jump to _harness_loop if rbx > 0
+  assm_.cmp(rbx, Imm8(0));
+  assm_.jg(Label {"_harness_loop"});
 
   // Restore callee-save state
   assm_.pop_1(r15);
@@ -414,6 +448,9 @@ Function Sandbox::emit_harness() {
 
   bool ok = assm_.finish();
   assert(ok);
+
+  std::cerr << fxn << std::endl;
+
   return fxn;
 }
 

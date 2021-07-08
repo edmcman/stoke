@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
 
   auto total_elapsed_seconds = std::chrono::duration<double>::zero ();
 
-  for (size_t i = 0; i < 1; ++i) {
+  {
     // These could be moved out of the loop; but in the real search
     // they are called frequently, so for benchmarking, keep them in.
     sb.insert_function(target);
@@ -73,12 +73,6 @@ int main(int argc, char** argv) {
     sb.run();
 
     total_elapsed_seconds = sb.total_time;
-    //total_elapsed_seconds += (sb.time_after - sb.time_before);
-
-    // Debugging
-    if (true) {
-      Console::msg() << "duration of iteration " << i << ": " << std::chrono::duration<double>(sb.time_after - sb.time_before).count() << " sec, total duration: " << total_elapsed_seconds.count () << " sec" << endl;
-    }
   }
   const auto rps = tcs.size() * benchmark_itr_arg / total_elapsed_seconds.count();
 
